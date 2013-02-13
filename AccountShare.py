@@ -20,6 +20,8 @@
 """
     TODO:
     * if lock set by different IP is older than x days, remove it and set own lock
+	* what about failed and manually started files of a package? "downloadPreparing"
+	  could be the wrong hook in this case.
 """
 
 import time
