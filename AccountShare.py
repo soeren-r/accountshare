@@ -46,24 +46,24 @@ class AccountShare(Hook):
         #callback to scheduler job for getting IP; will be removed by hookmanager when hook unloaded
         self.cb = None
         #set interval for "periodical"
-        self.interval = self.getConfig("intervalLocked")
+        #self.interval = self.getConfig("intervalLocked")
         #get IP on start and in 6h interval (as scheduled job)
         self.getExternalIp()
         #add event listener for "allDownloadsProcessed" #"allDownloadsFinished" does not seem to work always
         self.manager.addEvent("allDownloadsProcessed", self.removeLock)
         
     #will be automatically called on start, not only after first "self.interval" seconds
-    def periodical(self):
+    # def periodical(self):
         #check status online
-        self.logDebug("Checking status online.")
-        self.checkLockStatus()
-        self.logDebug("Processing status.")
-        self.processLockStatus()
+        # self.logDebug("Checking status online.")
+        # self.getLockStatus()
+        # self.logDebug("Processing status.")
+        # self.processLockStatus()
     
     def downloadPreparing(self, fid):
         #check status online before starting
         self.logDebug("Checking status online before starting download.")
-        self.checkLockStatus()
+        self.getLockStatus()
         self.logDebug("Processing status before starting download.")
         self.processLockStatus(periodical=False)
         
@@ -103,7 +103,7 @@ class AccountShare(Hook):
         next_time = 21600
         self.cb = self.core.scheduler.addJob(next_time, self.getExternalIp, threaded=True)
     
-    def checkLockStatus(self):
+    def getLockStatus(self):
         #get source of website
         myRSWebsiteSource = urllib2.urlopen('http://www.soerenrinne.de/rs/status.php?pyload=true').read()
         #split source by lines
@@ -120,19 +120,19 @@ class AccountShare(Hook):
                 self.logInfo("Account locked. Starting download server anyhow due to identical IP (" + self.ip + "). Will check again in " + str(self.getConfig("intervalUnlocked")) + " seconds.")
                 self.core.api.unpauseServer()
                 #adjust waiting time
-                self.interval = self.getConfig("intervalUnlocked")
+                #self.interval = self.getConfig("intervalUnlocked")
             else:
                 #pause pyload
                 self.logInfo("Account locked by " + self.lockStatus[1] + ", but our IP is " + self.ip + ". Stopping download server. Will check again in " + str(self.getConfig("intervalLocked")) + " seconds.")
                 self.core.api.pauseServer()
                 #adjust waiting time
-                self.interval = self.getConfig("intervalLocked")
+                #self.interval = self.getConfig("intervalLocked")
         elif self.lockStatus[0] == "unlocked":
             #unpause pyload
             self.logInfo("Account unlocked. Starting download server. Will check again in " + str(self.getConfig("intervalUnlocked")) + " seconds.")
             self.core.api.unpauseServer()
             #adjust waiting time
-            self.interval = self.getConfig("intervalUnlocked")
+            #self.interval = self.getConfig("intervalUnlocked")
             if not periodical:
                 #called while starting actual download, so set lock online
                 self.setLock()
@@ -140,7 +140,7 @@ class AccountShare(Hook):
         else:
             #something abnormal happened
             self.logError("Something is wrong with the status. I will set interval to 60 minutes.")
-            self.interval = 3600
+            #self.interval = 3600
         
     def removeLock(self):
         #remove lock online
