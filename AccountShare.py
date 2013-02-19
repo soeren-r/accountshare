@@ -114,7 +114,7 @@ class AccountShare(Hook):
         if self.lockStatus == "locked":
             if self.ip == self.lockIp:
                 #unpause pyload
-                self.logInfo("Account locked. Unpausing download server anyhow due to identical IP (" + self.ip + ").")
+                self.logInfo("Account locked. Downloading anyhow due to identical IP (" + self.ip + ").")
                 self.core.api.unpauseServer()
                 self.core.scheduler.removeJob(self.cbAccount)
             else:
